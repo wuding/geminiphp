@@ -1,4 +1,8 @@
-# ♊ Geminiphp
+# ♊ Geminiphp 2018.7.20
+
+包 wuding/geminiphp
+
+源码库 https://github.com/wuding/geminiphp
 
 这个时期只使用 Composer 类加载，路由 nikic/fast-route 模板 league/plates
 
