@@ -1,0 +1,30 @@
+{
+    "name": "wuding/astrophp",
+    "type": "library",
+    "version": "0.0.1",
+    "description": "A PHP Framework",
+    "keywords": ["framework", "mvc"],
+    "homepage": "https://github.com/wuding/astrophp",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+          "name": "Benny Wu",
+          "email": "contact@wubenli.com",
+          "homepage": "http://wubenli.com",
+          "role": "Developer"
+        }
+      ],
+    "require": {
+        "php": "^5.4|^7.0",
+        "nikic/fast-route": "^1.3.0",
+        "league/plates": "^3.3",
+        "catfan/Medoo": "^1.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Astro\\": "src/Astro/",
+            "MagicCube\\": "src/MagicCube/",
+            "app\\": "app/"
+        }
+    }
+}
