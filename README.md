@@ -1,4 +1,13 @@
-# AstroPHP
+# ♊ Geminiphp
+
+这个时期只使用 Composer 类加载，路由 nikic/fast-route 模板 league/plates
+
+模块调用使用自己写的 wuding/magic-cube 分默认模块和多模块，控制器和动作支持 RESTful 方式
+
+模板支持主题和设备
+
+自带控制台调试
+
 快速开发 RESTful APIs 和 Web 应用的 PHP 框架
 
 ## 起步
@@ -6,7 +15,7 @@
 * ### 编写 composer.json
 ```
 {
-    "name": "wuding/astrophp",
+    "name": "wuding/miniphp",
     "type": "library",
     "version": "0.0.1",
     "description": "A PHP Framework",
@@ -141,14 +150,15 @@ echo $html = $php->template->render($this->templateFile, $var);
 
 /app/template/index/index.php
 ```
+
 ```
 
 /app/template/layout.php
 ```
+
 ```
 
 "wuding/equiv-route": "^0.1",
-		"wuding/magic-cube": "^0.1",
-		"wuding/topdb": "^0.1",
-		"wuding/newui": "^0.1",
-		
+"wuding/magic-cube": "^0.1",
+"wuding/topdb": "^0.1",
+"wuding/newui": "^0.1",
