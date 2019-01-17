@@ -50,7 +50,7 @@ if (isset($_GET['phpinfo']) || (isset($_SERVER['PATH_INFO']) && '/phpinfo' == $_
  *
  */
 require_once __DIR__ . '/../app/bootstrap.php';
-new Astro\Php();
+new Astro\Php(APP_PATH . '/config.php');
 
 
 // 结束调试问题

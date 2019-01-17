@@ -20,7 +20,8 @@ class Controller
 	public $httpMethod = null; //请求的HTTP方式
 	public $templateFile = null;
 	public $theme = 'aero';
-	public $templateAll = 0;
+	public $templateAll = false;
+	public $enable_view = true;
 	
 	public function __construct($action = '')
 	{
@@ -28,7 +29,7 @@ class Controller
 		$this->actionName = $action;
 		$action = $action ? : $this->action;
 		
-		$this->httpMethod = strtolower($_SERVER['REQUEST_METHOD']);
+		$this->httpMethod = strtolower($GLOBALS['PHP']->httpMethod);
 		
 		/* 检测方法是否存在 */
 		$this->methods = $methods = get_class_methods($this);
@@ -49,17 +50,17 @@ class Controller
 	
 	public function _notfound()
 	{
-		print_r([$GLOBALS['PHP'], __METHOD__, __LINE__, __FILE__]);
+		return [];
 	}
 	
 	public function _default()
 	{
-		print_r([$GLOBALS['PHP'], __METHOD__, __LINE__, __FILE__]);
+		return [];
 	}
 	
 	public function _get()
 	{
-		print_r([__METHOD__, __LINE__, __FILE__]);
+		return [];
 	}
 	
 	/*
@@ -81,7 +82,9 @@ class Controller
 		/* 方法映射 */
 		if (isset($maps[$action]) && $map = $maps[$action]) {
 			if (isset($map[$method]) && $name = $map[$method]) {
-				$action = $name;
+				if (in_array($name, $this->methods)) {
+					$action = $name;
+				}
 			}
 		}
 		$this->actionRun = $action;
@@ -148,18 +151,20 @@ class Controller
 		$decode = [$theme, $module, $controller, $path, $extension, $file, $url, $pathinfo];
 		
 		/* 模板路径 */
-		$folder = '';
-		# if ($module) {
-			$folder = $this->templateAll ? ($module ? : 'index') . '/' : '';
-		# }
-		$script = $theme . '/' . $folder . $controller . $path;
+		$module_folder = $this->templateAll ? ($module ? : 'index') . '/' : '';
+		$script = $theme . '/' . $module_folder . $controller . $path;
+		$template_folder = '';
 		if (!$this->templateAll && $module && 'index' != $module) {
-			$php->template->addFolder($module, APP_PATH . '/module/' . $module . '/template');
+			$template_folder = APP_PATH . '/module/' . $module . '/template';
+			$php->template->addFolder($module, $template_folder);
 			$script = $module . '::' . $script;
 		}
-		# print_r([$default, $custom, $decode, $script]);exit;
+		# print_r([$default, $custom, $decode, $script, $module_folder, $template_folder]);exit;
 		
 		/* 渲染页面 */
-		echo $html = $php->template->render($script, $var);
+		if ($this->enable_view) {
+			echo $html = $php->template->render($script, $var);
+		}
+		
 	}
 }

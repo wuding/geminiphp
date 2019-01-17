@@ -4,6 +4,9 @@ namespace MagicCube;
 class Dispatcher
 {
 	public $moduleFolder = 0; //把默认模块控制器也放在统一模块文件夹
+	public $moduleName = 'index';
+	public $controllerName = 'index';
+	public $actionName = 'index';
 	
 	public function __construct($routeInfo = [], $httpMethod = '')
 	{
@@ -50,11 +53,29 @@ class Dispatcher
 					$handler = $ctrlInfo[0];
 				}
 				# print_r($ctrlInfo);exit;
+
+				$module = $controller = $action = '';
 				
 				$pathInfo = explode('/', $handler);
-				$this->moduleName = $module = $pathInfo[0] ? : 'index';
-				$this->controllerName = $controller = $pathInfo[1] ? : 'index';
-				$this->actionName = $action = $pathInfo[2] ? : 'index';
+				$count = count($pathInfo);
+				switch ($count) {
+					case 0:
+						break;
+					case 1:
+						list($action) = $pathInfo;
+						break;
+					case 2:
+						list($controller, $action) = $pathInfo;
+						break;
+					case 3:
+						list($module, $controller, $action) = $pathInfo;
+						break;
+					default:
+						break;
+				}
+				$this->moduleName = $module = $module ? : $this->moduleName;
+				$this->controllerName = $controller = $controller ? : $this->controllerName;
+				$this->actionName = $action = $action ? : $this->actionName;
 				
 				$moduleFolder = 1;
 				if (!$this->moduleFolder) {

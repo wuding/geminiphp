@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controller\get;
+namespace app\controller\put;
 
 class Index extends \Astro\Controller
 {
