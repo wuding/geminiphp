@@ -3,14 +3,16 @@ namespace MagicCube;
 
 class Dispatcher
 {
-	public $moduleFolder = 0; //把默认模块控制器也放在统一模块文件夹
+	public $defaultModuleFolder = 0; //0放应用文件夹 1、2 同下
+	public $moduleFolder = 2; //0不使用多模块 1使用多模块 2统一模块文件夹
+	public $methodFolder = 0; //1使用方法文件夹（仅有单个方法时）
 	public $moduleName = 'index';
 	public $controllerName = 'index';
 	public $actionName = 'index';
 	
 	public function __construct($routeInfo = [], $httpMethod = '')
 	{
-		# print_r([$routeInfo, __METHOD__, __LINE__, __FILE__]);# 
+		# print_r([$routeInfo, __METHOD__, __LINE__, __FILE__]);
 		$this->routeInfo =  $routeInfo;
 		$this->httpMethod =  $httpMethod;
 		$this->dispatch();
@@ -18,6 +20,10 @@ class Dispatcher
 	
 	public function dispatch($httpMethod = '', $uri = '')
 	{
+		if ($this->moduleFolder < $this->defaultModuleFolder) {
+			$this->defaultModuleFolder = $this->moduleFolder;
+		}
+
 		$httpMethod = $httpMethod ? : $this->httpMethod;
 		$routeInfo = $this->routeInfo;
 		
@@ -77,26 +83,48 @@ class Dispatcher
 				$this->controllerName = $controller = $controller ? : $this->controllerName;
 				$this->actionName = $action = $action ? : $this->actionName;
 				
-				$moduleFolder = 1;
-				if (!$this->moduleFolder) {
-					if ('index' == strtolower($module)) {
-						$moduleFolder = 0;
-					}
+				if ('index' == strtolower($module)) {
+					$this->moduleFolder = $this->defaultModuleFolder;
 				}
-				$module_str = $moduleFolder ? '\\module\\' . $module : '';
+				if (!$this->moduleFolder) {
+					$module = 'index' == $module ? $module : '';
+					$this->controllerName = $controller = $this->moduleName;;
+					$this->actionName = $action = $this->controllerName;
+				}
+				$module_str = 2 == $this->moduleFolder ? '\\module\\' . $module : (1 == $this->moduleFolder ? '\\' . $module : '');
 				if (preg_match("/,|all/", $httpMethod) || !$httpMethod) {
 					$httpMethod = '';
-				} else {
+				} elseif ($this->methodFolder) {
 					$httpMethod = "\\$httpMethod";
 				}
 				
 				$class = "\\app$module_str\\controller$httpMethod\\$controller";
+				// 方法未定义
 				if ($httpMethod && !class_exists($class)) {
 					$class = "\\app$module_str\\controller\\$controller";
+					// 控制器未定义
+					if (!class_exists($class)) {
+						if ('_abstract' != $controller) {
+							$controller_tmp = '_abstract';
+							$class = "\\app$module_str\\controller\\$controller_tmp";
+						}
+						// 模块未定义
+						if (!class_exists($class)) {
+							$module = '_prototype';
+							$module_str_tmp = 2 == $this->moduleFolder ? '\\module\\' . $module : (1 == $this->moduleFolder ? '\\' . $module : '');
+							$class = "\\app$module_str_tmp\\controller\\$controller";
+							// 控制器还是未定义
+							if (!class_exists($class)) {
+								if ('_abstract' != $controller) {
+									$controller_tmp = '_abstract';
+									$class = "\\app$module_str_tmp\\controller\\$controller_tmp";
+								}
+							}
+						}
+					}
 				}
 				$this->controllerClass = $class;
 				$GLOBALS['PHP']->dispatcher = $this;
-				
 				$object = new $class();# $action
 			}
 		}
