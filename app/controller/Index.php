@@ -1,5 +1,8 @@
 <?php
+
 namespace app\controller;
+
+debug_file(__FILE__);
 
 class Index extends \Astro\Controller
 {
@@ -12,6 +15,6 @@ class Index extends \Astro\Controller
 
 	public function index()
 	{
-		return [];
+		return ['url' => ''];
 	}
 }

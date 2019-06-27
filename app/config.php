@@ -7,6 +7,7 @@ defined('BASE_DIR') or define('BASE_DIR', __DIR__ . '/..');
 # define('VENDOR_DIR', __DIR__ . '/../vendor');
 defined('VENDOR_DIR') or define('VENDOR_DIR', 'C:/Users/Administrator/AppData/Local/Composer/files');
 defined('COMPOSER_JSON') or define('COMPOSER_JSON', realpath(BASE_DIR . '/composer.json'));
+defined('HHVM_VERSION') or define('HHVM_VERSION', '-1');
 
 return [
     'route' => [
@@ -19,5 +20,8 @@ return [
     ],
     'autoload' => [
         'file' => 'E:/env/www/work/wuding/anfora/src/autoload.php',
+    ],
+    'debug' => [
+        'file' => 1,
     ],
 ];
