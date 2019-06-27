@@ -14,7 +14,7 @@ class Php
             $config = include $config;
         }
 
-        $this->routeRule = $config['route'] ?? [];
+        $this->routeRule = isset($config['route']) ? $config['route'] : [];
 
         $dispatcher = \FastRoute\simpleDispatcher(function(\FastRoute\RouteCollector $r) {
             $this->addRoute($r, $this->routeRule);
