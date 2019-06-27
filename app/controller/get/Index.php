@@ -2,6 +2,8 @@
 
 namespace app\controller\get;
 
+debug_file(__FILE__);
+
 use Astro\Ext\PhpCurl;
 
 class Index extends \Astro\Controller

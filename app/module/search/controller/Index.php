@@ -2,6 +2,8 @@
 
 namespace app\module\search\controller;
 
+debug_file(__FILE__);
+
 class Index extends \Astro\Controller
 {
 	public $action = '_notfound';
