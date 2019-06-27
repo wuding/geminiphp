@@ -20,8 +20,12 @@ return [
     ],
     'autoload' => [
         'file' => 'E:/env/www/work/wuding/anfora/src/autoload.php',
+        'php-ext' => 'E:/env/www/work/wuding/php-ext/src',
     ],
     'debug' => [
-        'file' => 1,
+        'file' => 0,
     ],
+    'cache' => [
+        'web' => 'E:/env/www/legend/dist',
+    ]
 ];

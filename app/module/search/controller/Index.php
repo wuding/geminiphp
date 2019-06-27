@@ -46,10 +46,17 @@ class Index extends \Astro\Controller
 	public function http($url)
 	{
 		$uri = parse_url($url);
-		#print_r($url);
-		#exit;
-		$urn = $uri['scheme'] . '://' . $uri['host'] . $uri['path'];
-		$extension = null;
+		$urn = $uri['scheme'] . '://' . $uri['host'] . (isset($uri['path']) ? $uri['path'] : '');
+		$extension = $host = null;
+
+		// 代理主机配置
+		$hosts = array(
+			'schema.org' => 'schema.org',
+			'www.php.net' => 1,
+			'fanyi.baidu.com' => 1,
+		);
+
+		// 扩展名匹配
 		if (preg_match("/\.([a-z0-9]+)$/i", $urn, $matches)) {
 			# print_r($matches);
 			$extension = strtolower($matches[1]);
@@ -61,7 +68,15 @@ class Index extends \Astro\Controller
 			default;
 				break;
 		}
-		return ['name' => $url];
+
+		// 主机匹配
+		# if (array_key_exists($uri['host'], $hosts)) {
+			# $host = $hosts[$uri['host']];
+			return $this->proxy($url);
+		# }
+
+		// 无任何匹配
+		return ['url' => $url];
 	}
 	
 	public function m3u8($url)
@@ -78,6 +93,57 @@ class Index extends \Astro\Controller
 	public function _post_index()
 	{
 		print_r([isset($_POST['q2']) ? $_POST['q2'] : print_r($_POST, true), __METHOD__, __LINE__, __FILE__]);
+	}
+
+	public function proxy($url)
+	{
+		global $_CONFIG;
+		include $_CONFIG['autoload']['php-ext'] . '/PhpCurl.php';
+		include $_CONFIG['autoload']['php-ext'] . '/Filesystem.php';
+
+		$arg_url = $url;
+		$uri = parse_url($url);
+
+		// 修复地址
+		$path = isset($uri['path']) ? $uri['path'] : '';
+		$pathinfo = pathinfo($path);
+		$basename = isset($pathinfo['basename']) ? $pathinfo['basename'] : '';
+		if (!$basename) {
+			$basename = md5('') . '.txt';
+		}
+
+		// 重置地址
+		$dirname = preg_replace('/^[\/\\\]+$/', '', isset($pathinfo['dirname']) ? $pathinfo['dirname'] : '');
+		$dirname = $dirname ? '/' . $dirname . '/' : '/';
+		$filename = array('dirname' => $dirname );
+		$filename['basename'] = $basename;
+		$uri['path'] = $name = implode('', $filename);
+		if (isset($uri['query'])) {
+			$uri['query'] = '__' . $uri['query'];
+		}
+		$uri['scheme'] .= '://';
+		$file = implode('', $uri);
+
+		$url = preg_replace(['/:/', '/[\/\\\]+/'], ['', '/'], $file);
+        $url = $_CONFIG['cache']['web'] . '/' . $url;
+		# print_r(get_defined_vars());exit;
+
+        // 直接读取
+        if (file_exists($url)) {
+            echo $data = \Ext\Filesystem::getContents($url);
+            exit;
+        }
+
+        // 写入
+        $curl = new \Ext\PhpCurl($url);
+		$data = $curl->simulate();
+		# if ($data) {
+			echo \Ext\Filesystem::putContents($url, $data ? : 'timeout', 'not overwrite');
+			exit;
+		# }
+
+		// 失败
+		return ['url' => $arg_url];
 	}
 }
 
